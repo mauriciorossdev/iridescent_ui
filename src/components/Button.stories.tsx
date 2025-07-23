@@ -110,4 +110,20 @@ export const SensorDemo: Story = {
       },
     },
   },
+};
+
+export const ShadowEffect: Story = {
+  args: {
+    children: 'Botón con Sombra Dinámica',
+    enableSensors: true,
+    variant: 'primary',
+    size: 'large',
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Botón con efecto de sombra dinámica que responde al acelerómetro. La sombra se mueve según la inclinación del dispositivo, simulando una fuente de luz real.',
+      },
+    },
+  },
 }; 

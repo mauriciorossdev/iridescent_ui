@@ -61,7 +61,8 @@ export const Button: React.FC<ButtonProps> = ({
     isMoving: false,
     tilt: { x: 0, y: 0 },
     isNear: false,
-    lightLevel: 'unknown'
+    lightLevel: 'unknown',
+    shadowDirection: { x: 0, y: 0 }
   });
 
   // Configurar sensores si están habilitados
@@ -105,6 +106,13 @@ export const Button: React.FC<ButtonProps> = ({
         setSensorState(prev => ({ ...prev, lightLevel }));
         onLightChange?.(lightLevel);
       }
+
+      // Calcular dirección de sombra
+      const shadowDirection = sensors.getShadowDirection();
+      if (Math.abs(shadowDirection.x - sensorState.shadowDirection.x) > 0.5 || 
+          Math.abs(shadowDirection.y - sensorState.shadowDirection.y) > 0.5) {
+        setSensorState(prev => ({ ...prev, shadowDirection }));
+      }
     }, 100);
 
     return () => clearInterval(interval);
@@ -146,7 +154,10 @@ export const Button: React.FC<ButtonProps> = ({
       onClick={onClick}
       disabled={disabled}
       style={{
-        transform: enableSensors ? `rotateX(${sensorState.tilt.y}deg) rotateY(${sensorState.tilt.x}deg)` : undefined
+        transform: enableSensors ? `rotateX(${sensorState.tilt.y}deg) rotateY(${sensorState.tilt.x}deg)` : undefined,
+        boxShadow: enableSensors ? 
+          `${sensorState.shadowDirection.x}px ${sensorState.shadowDirection.y}px 20px rgba(0, 0, 0, 0.3)` : 
+          undefined
       }}
       {...props}
     >
@@ -154,6 +165,7 @@ export const Button: React.FC<ButtonProps> = ({
       {enableSensors && (
         <div className="text-xs mt-1 opacity-50">
           {sensors.isSupported.accelerometer && `Mov: ${sensorState.isMoving ? 'Sí' : 'No'}`}
+          {sensors.isSupported.accelerometer && ` | Sombra: (${sensorState.shadowDirection.x.toFixed(1)}, ${sensorState.shadowDirection.y.toFixed(1)})`}
           {sensors.isSupported.proximity && ` | Prox: ${sensorState.isNear ? 'Cerca' : 'Lejos'}`}
           {sensors.isSupported.light && ` | Luz: ${sensorState.lightLevel}`}
         </div>

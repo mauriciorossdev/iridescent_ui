@@ -281,6 +281,24 @@ export const useMobileSensors = (options: UseMobileSensorsOptions = {}) => {
     return 'bright';
   }, [sensorData.light]);
 
+  // Calcular dirección de sombra basada en acelerómetro
+  const getShadowDirection = useCallback(() => {
+    const { acceleration } = sensorData;
+    if (acceleration.x === null || acceleration.y === null) {
+      return { x: 0, y: 0 };
+    }
+
+    // Normalizar los valores del acelerómetro (-1 a 1)
+    const normalizedX = Math.max(-1, Math.min(1, acceleration.x / 10));
+    const normalizedY = Math.max(-1, Math.min(1, acceleration.y / 10));
+
+    // Calcular ángulos para la sombra
+    const shadowX = normalizedX * 20; // Máximo 20px de desplazamiento
+    const shadowY = normalizedY * 20;
+
+    return { x: shadowX, y: shadowY };
+  }, [sensorData.acceleration]);
+
   return {
     sensorData,
     isSupported,
@@ -289,6 +307,7 @@ export const useMobileSensors = (options: UseMobileSensorsOptions = {}) => {
     detectTilt,
     isNear,
     getLightLevel,
+    getShadowDirection,
     start: () => setIsActive(true),
     stop: () => setIsActive(false)
   };
